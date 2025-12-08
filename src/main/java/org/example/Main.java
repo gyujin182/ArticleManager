@@ -12,7 +12,7 @@ public class Main {
 
         System.out.println("==프로그램 시작==");
 
-        int lastArticleId = 0;
+        int lastArticleId = 3;
 
         List<Article> articles = new ArrayList<>();
 

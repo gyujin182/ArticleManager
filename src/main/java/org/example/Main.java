@@ -1,6 +1,7 @@
 package org.example;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
 
@@ -135,15 +136,33 @@ public class Main {
                 foundArticle.setUpdateDate(Util.getNowStr());
 
                 System.out.println(id + "번 게시글이 수정되었습니다");
-            
-                }else
-                System.out.println("사용할 수 없는 명령어입니다");
-            }
+            } else if (cmd.contains("search")) {
+                String search = cmd.split(" ")[1];
+                List<Article> foundArticle = null;
+                for (Article searchbody : articles) {
+                    if (searchbody.getBody() == search) {
+                        foundArticle = Collections.singletonList(searchbody);
+                        if (foundArticle == null) {
+                            System.out.println("해당 게시글은 없습니다");
+                            continue;
+                        }
+                        for (int i = articles.size() - 1; i >= 0; i--) {
+                            Article article = articles.get(i);
+                            if (Util.getNowStr().split(" ")[0].equals(article.getRegDate().split(" ")[0])) {
+                                System.out.printf("   %d     /    %s          /    %s     /     %s   \n", article.getId(), article.getRegDate().split(" ")[1], article.getTitle(), article.getBody());
+                            } else {
+                                System.out.printf("   %d     /    %s          /    %s     /     %s   \n", article.getId(), article.getRegDate().split(" ")[0], article.getTitle(), article.getBody());
+                            }
+                        }
+                    }
+                }
+            } else System.out.println("사용할 수 없는 명령어입니다");
+        }
             System.out.println("==프로그램 끝==");
             sc.close();
 
-        }
 
+    }
         private static void makeTestData (ArrayList < Article > articles) {
             for (int i = 0; i < 3; i++) {
                 int id = i;

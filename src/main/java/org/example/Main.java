@@ -7,57 +7,25 @@ import java.util.Scanner;
 public class Main {
 
     static List<Article> articles = new ArrayList<>();
-    static List<member> members = new ArrayList<>();
+    static List<Member> members = new ArrayList<>();
 
     public static void main(String[] args) {
-
 
         Scanner sc = new Scanner(System.in);
 
         System.out.println("==프로그램 시작==");
 
         int lastArticleId = 3;
+        int lastMemberId = 0;
 
         makeTestData();
+        membersTest();
 
 
-        System.out.println("*" + " 아이디가 없다면 \"회원가입\"이라고 작성해주세요" + "*");
+
+
         System.out.println("로그인이 필요합니다.");
-        while (true) {
-            System.out.println("아이디를 작성해주세요");
-            System.out.print("Id)");
-            String LoginId = sc.nextLine();
-            if (LoginId.contains("회원가입")) {
-                System.out.print("ID 작성)");
-                String id = sc.nextLine();
-                for (member member : members) {
-                    if (member.getId().contains(LoginId)) {
-                        System.out.println("이미 등록된 ID입니다.");
-                    }
-                }
-                System.out.print("password 작성)");
-                String password = sc.nextLine();
-                member member = new member(LoginId, password);
-                members.add(member);
-                System.out.println("회원가입 완료되었습니다.");
-                continue;
-            }
-            System.out.print("password 작성)");
-            String LoginPassword = sc.nextLine();
-            for (int i = 0; i < members.size(); i++) {
-                member member = members.get(i);
-
-                if (member.getPassword().contains(LoginPassword)) {
-                    if (member.getId().contains(LoginId)) {
-                        System.out.println("로그인 되었습니다");
-                        break;
-                    }
-                } else {
-                    System.out.println("Id 혹은 비밀번호가 틀렸습니다.");
-                    System.out.println("아이디를 작성해주세요");
-                }
-            }
-        break;}
+        System.out.println("*" + " 아이디가 없다면 \"회원가입\"이라고 작성해주세요" + "*");
 
         while (true) {
             System.out.print("명령어 ) ");
@@ -69,8 +37,61 @@ public class Main {
                 System.out.println("명령어 입력하세요");
                 continue;
             }
+            if (cmd.contains("Login")) {
+                while (true) {
+                    System.out.print("ID) ");
+                    String id = sc.nextLine();
+                    System.out.print("Password) ");
+                    String password = sc.nextLine();
+                    if (isJoinableLoginId(id) == false) {
+                        if (password.equals((password))) {
+                            for (Member member : members) {
+                                System.out.println("로그인 되었습니다.");
+                                break;
+                            }
+                        } else {
+                            System.out.println("Password 또는 ID가 잘못 입력되었습니다.");
+                        }
+                    }
+                }
 
-            if (cmd.equals("article write")) {
+            }
+            if (cmd.equals("member join")) {
+                System.out.println("==회원 가입==");
+                int id = lastMemberId + 1;
+                String loginId = null;
+                while (true) {
+                    System.out.print("로그인 아이디 : ");
+                    loginId = sc.nextLine().trim();
+                    if (isJoinableLoginId(loginId) == false) {
+                        System.out.println("이미 사용중인 loginId");
+                        continue;
+                    }
+                    break;
+                }
+                String password = null;
+                while (true) {
+                    System.out.print("비밀번호 : ");
+                    password = sc.nextLine().trim();
+                    System.out.print("비밀번호 확인: ");
+                    String passwordConfirm = sc.nextLine().trim();
+                    if (password.equals(passwordConfirm) == false) {
+                        System.out.println("비번 확인해");
+                        continue;
+                    }
+                    break;
+                }
+                System.out.print("이름 : ");
+                String name = sc.nextLine().trim();
+                String regDate = Util.getNowStr();
+                String updateDate = Util.getNowStr();
+
+                Member member = new Member(id, regDate, updateDate, loginId, password, name);
+                members.add(member);
+
+                System.out.println(id + "번 회원이 가입 되었습니다.");
+                lastMemberId++;
+            } else if (cmd.equals("article write")) {
                 System.out.println("==게시글 작성==");
                 int id = lastArticleId + 1;
                 System.out.print("제목 : ");
@@ -91,7 +112,6 @@ public class Main {
                     System.out.println("아무것도 없음");
                     continue;
                 }
-
 
                 String searchKeyword = cmd.substring("article list".length()).trim();
 
@@ -185,6 +205,15 @@ public class Main {
         sc.close();
     }
 
+    private static boolean isJoinableLoginId(String loginId) {
+        for (Member member : members) {
+            if (member.getLoginId().equals(loginId)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     private static Article getArticleById(int id) {
         for (Article article : articles) {
             if (article.getId() == id) {
@@ -202,6 +231,78 @@ public class Main {
         articles.add(new Article(1, "2025-12-07 12:12:12", "2025-12-07 12:12:12", "제목 123", "내용 1"));
         articles.add(new Article(2, Util.getNowStr(), Util.getNowStr(), "제목 23", "내용 2"));
         articles.add(new Article(3, Util.getNowStr(), Util.getNowStr(), "제목 1234", "내용 3"));
+    }
+    private static void membersTest() {
+        System.out.println("==테스트 데이터 생성==");
+        members.add(new Member(1, "2025-12-07 1:1:1", "2025-12-07 1:1:1", "규진", "내용 1","규진"));
+        members.add(new Member(2, "2025-12-07 2:2:2", "2025-12-07 2:2:2", "큐진", "내용 2","규쥔"));
+        members.add(new Member(3, "2025-12-07 3:3:3", "2025-12-07 3:3:3", "뀨진", "내용 3","규좡"));
+    }
+}
+
+class Member {
+    private int id;
+    private String regDate;
+    private String updateDate;
+    private String loginId;
+    private String password;
+    private String name;
+
+    public Member(int id, String updateDate, String regDate, String loginId, String password, String name) {
+        this.id = id;
+        this.updateDate = updateDate;
+        this.regDate = regDate;
+        this.loginId = loginId;
+        this.password = password;
+        this.name = name;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getRegDate() {
+        return regDate;
+    }
+
+    public void setRegDate(String regDate) {
+        this.regDate = regDate;
+    }
+
+    public String getLoginId() {
+        return loginId;
+    }
+
+    public void setLoginId(String loginId) {
+        this.loginId = loginId;
+    }
+
+    public String getUpdateDate() {
+        return updateDate;
+    }
+
+    public void setUpdateDate(String updateDate) {
+        this.updateDate = updateDate;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }
 
@@ -258,33 +359,5 @@ class Article {
 
     public void setBody(String body) {
         this.body = body;
-    }
-
-
-}
-
-class member {
-    public String getId() {
-        return Id;
-    }
-
-    public void setId(String id) {
-        Id = id;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    private String Id;
-    private String password;
-
-    public member(String Id, String password) {
-        this.Id = Id;
-        this.password = password;
     }
 }

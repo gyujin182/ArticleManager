@@ -7,8 +7,10 @@ import java.util.Scanner;
 public class Main {
 
     static List<Article> articles = new ArrayList<>();
+    static List<member> members = new ArrayList<>();
 
     public static void main(String[] args) {
+
 
         Scanner sc = new Scanner(System.in);
 
@@ -17,6 +19,45 @@ public class Main {
         int lastArticleId = 3;
 
         makeTestData();
+
+
+        System.out.println("*" + " 아이디가 없다면 \"회원가입\"이라고 작성해주세요" + "*");
+        System.out.println("로그인이 필요합니다.");
+        while (true) {
+            System.out.println("아이디를 작성해주세요");
+            System.out.print("Id)");
+            String LoginId = sc.nextLine();
+            if (LoginId.contains("회원가입")) {
+                System.out.print("ID 작성)");
+                String id = sc.nextLine();
+                for (member member : members) {
+                    if (member.getId().contains(LoginId)) {
+                        System.out.println("이미 등록된 ID입니다.");
+                    }
+                }
+                System.out.print("password 작성)");
+                String password = sc.nextLine();
+                member member = new member(LoginId, password);
+                members.add(member);
+                System.out.println("회원가입 완료되었습니다.");
+                continue;
+            }
+            System.out.print("password 작성)");
+            String LoginPassword = sc.nextLine();
+            for (int i = 0; i < members.size(); i++) {
+                member member = members.get(i);
+
+                if (member.getPassword().contains(LoginPassword)) {
+                    if (member.getId().contains(LoginId)) {
+                        System.out.println("로그인 되었습니다");
+                        break;
+                    }
+                } else {
+                    System.out.println("Id 혹은 비밀번호가 틀렸습니다.");
+                    System.out.println("아이디를 작성해주세요");
+                }
+            }
+        break;}
 
         while (true) {
             System.out.print("명령어 ) ");
@@ -220,4 +261,30 @@ class Article {
     }
 
 
+}
+
+class member {
+    public String getId() {
+        return Id;
+    }
+
+    public void setId(String id) {
+        Id = id;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    private String Id;
+    private String password;
+
+    public member(String Id, String password) {
+        this.Id = Id;
+        this.password = password;
+    }
 }

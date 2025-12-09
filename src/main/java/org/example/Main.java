@@ -1,11 +1,13 @@
 package org.example;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
 
 public class Main {
+
+    static List<Article> articles = new ArrayList<>();
+
     public static void main(String[] args) {
 
         Scanner sc = new Scanner(System.in);
@@ -14,10 +16,7 @@ public class Main {
 
         int lastArticleId = 3;
 
-        List<Article> articles = new ArrayList<>();
-
-
-        makeTestData((ArrayList<Article>) articles);
+        makeTestData();
 
         while (true) {
             System.out.print("명령어 ) ");
@@ -45,35 +44,50 @@ public class Main {
 
                 System.out.println(id + "번 글이 작성되었습니다.");
                 lastArticleId++;
-            } else if (cmd.equals("article list")) {
+            } else if (cmd.startsWith("article list")) {
                 System.out.println("==게시글 목록==");
                 if (articles.size() == 0) {
                     System.out.println("아무것도 없음");
-                } else {
-                    System.out.println("   번호  /       날짜       /       제목     /   내용  ");
-                    for (int i = articles.size() - 1; i >= 0; i--) {
-                        Article article = articles.get(i);
-                        if (Util.getNowStr().split(" ")[0].equals(article.getRegDate().split(" ")[0])) {
-                            System.out.printf("   %d     /    %s          /    %s     /     %s   \n", article.getId(), article.getRegDate().split(" ")[1], article.getTitle(), article.getBody());
-                        } else {
-                            System.out.printf("   %d     /    %s          /    %s     /     %s   \n", article.getId(), article.getRegDate().split(" ")[0], article.getTitle(), article.getBody());
-                        }
+                    continue;
+                }
 
+
+                String searchKeyword = cmd.substring("article list".length()).trim();
+
+                List<Article> forPrintArticles = articles;
+
+                if (searchKeyword.length() > 0) {
+                    System.out.println("검색어 : " + searchKeyword);
+                    forPrintArticles = new ArrayList<>();
+
+                    for (Article article : articles) {
+                        if (article.getTitle().contains(searchKeyword)) {
+                            forPrintArticles.add(article);
+                        }
+                    }
+                    if (forPrintArticles.size() == 0) {
+                        System.out.println("검색 결과 없음");
+                        continue;
                     }
                 }
+
+                System.out.println("   번호  /       날짜       /       제목     /   내용  ");
+                for (int i = forPrintArticles.size() - 1; i >= 0; i--) {
+                    Article article = forPrintArticles.get(i);
+                    if (Util.getNowStr().split(" ")[0].equals(article.getRegDate().split(" ")[0])) {
+                        System.out.printf("   %d     /    %s          /    %s     /     %s   \n", article.getId(), article.getRegDate().split(" ")[1], article.getTitle(), article.getBody());
+                    } else {
+                        System.out.printf("   %d     /    %s          /    %s     /     %s   \n", article.getId(), article.getRegDate().split(" ")[0], article.getTitle(), article.getBody());
+                    }
+
+                }
+
             } else if (cmd.startsWith("article detail")) {
                 System.out.println("==게시글 상세보기==");
 
                 int id = Integer.parseInt(cmd.split(" ")[2]);
 
-                Article foundArticle = null;
-
-                for (Article article : articles) {
-                    if (article.getId() == id) {
-                        foundArticle = article;
-                        break;
-                    }
-                }
+                Article foundArticle = getArticleById(id);
 
                 if (foundArticle == null) {
                     System.out.println("해당 게시글은 없습니다");
@@ -90,14 +104,7 @@ public class Main {
 
                 int id = Integer.parseInt(cmd.split(" ")[2]);
 
-                Article foundArticle = null;
-
-                for (Article article : articles) {
-                    if (article.getId() == id) {
-                        foundArticle = article;
-                        break;
-                    }
-                }
+                Article foundArticle = getArticleById(id);
 
                 if (foundArticle == null) {
                     System.out.println("해당 게시글은 없습니다");
@@ -110,14 +117,7 @@ public class Main {
 
                 int id = Integer.parseInt(cmd.split(" ")[2]);
 
-                Article foundArticle = null;
-
-                for (Article article : articles) {
-                    if (article.getId() == id) {
-                        foundArticle = article;
-                        break;
-                    }
-                }
+                Article foundArticle = getArticleById(id);
 
                 if (foundArticle == null) {
                     System.out.println("해당 게시글은 없습니다");
@@ -136,98 +136,88 @@ public class Main {
                 foundArticle.setUpdateDate(Util.getNowStr());
 
                 System.out.println(id + "번 게시글이 수정되었습니다");
-            } else if (cmd.contains("search")) {
-                String search = cmd.split(" ")[1];
-                List<Article> foundArticle = null;
-                for (Article searchbody : articles) {
-                    if (searchbody.getBody() == search) {
-                        foundArticle = Collections.singletonList(searchbody);
-                        if (foundArticle == null) {
-                            System.out.println("해당 게시글은 없습니다");
-                            continue;
-                        }
-                        for (int i = articles.size() - 1; i >= 0; i--) {
-                            Article article = articles.get(i);
-                            if (Util.getNowStr().split(" ")[0].equals(article.getRegDate().split(" ")[0])) {
-                                System.out.printf("   %d     /    %s          /    %s     /     %s   \n", article.getId(), article.getRegDate().split(" ")[1], article.getTitle(), article.getBody());
-                            } else {
-                                System.out.printf("   %d     /    %s          /    %s     /     %s   \n", article.getId(), article.getRegDate().split(" ")[0], article.getTitle(), article.getBody());
-                            }
-                        }
-                    }
-                }
-            } else System.out.println("사용할 수 없는 명령어입니다");
-        }
-            System.out.println("==프로그램 끝==");
-            sc.close();
-
-
-    }
-        private static void makeTestData (ArrayList < Article > articles) {
-            for (int i = 0; i < 3; i++) {
-                int id = i;
-                String regDate = "test" + id;
-                String updateDate = "test" + id;
-                String title = "test" + id;
-                String body = "test" + id;
-                articles.add(new Article(id, regDate, updateDate, title, body));
+            } else {
+                System.out.println("사용할 수 없는 명령어입니다");
             }
         }
+        System.out.println("==프로그램 끝==");
+        sc.close();
     }
 
-    class Article {
-        private int id;
-        private String regDate;
-        private String updateDate;
-        private String title;
-        private String body;
-
-        public Article(int id, String regDate, String updateDate, String title, String body) {
-            this.id = id;
-            this.regDate = regDate;
-            this.updateDate = updateDate;
-            this.title = title;
-            this.body = body;
+    private static Article getArticleById(int id) {
+        for (Article article : articles) {
+            if (article.getId() == id) {
+                return article;
+            }
         }
-
-        public int getId() {
-            return id;
-        }
-
-        public String getUpdateDate() {
-            return updateDate;
-        }
-
-        public void setUpdateDate(String updateDate) {
-            this.updateDate = updateDate;
-        }
-
-        public String getRegDate() {
-            return regDate;
-        }
-
-        public void setRegDate(String regDate) {
-            this.regDate = regDate;
-        }
-
-        public void setId(int id) {
-            this.id = id;
-        }
-
-        public String getTitle() {
-            return title;
-        }
-
-        public void setTitle(String title) {
-            this.title = title;
-        }
-
-        public String getBody() {
-            return body;
-        }
-
-        public void setBody(String body) {
-            this.body = body;
-        }
-
+        return null;
     }
+
+    /**
+     * 게시글 테스트 데이터 생성
+     **/
+    private static void makeTestData() {
+        System.out.println("==테스트 데이터 생성==");
+        articles.add(new Article(1, "2025-12-07 12:12:12", "2025-12-07 12:12:12", "제목 123", "내용 1"));
+        articles.add(new Article(2, Util.getNowStr(), Util.getNowStr(), "제목 23", "내용 2"));
+        articles.add(new Article(3, Util.getNowStr(), Util.getNowStr(), "제목 1234", "내용 3"));
+    }
+}
+
+class Article {
+    private int id;
+    private String regDate;
+    private String updateDate;
+    private String title;
+    private String body;
+
+    public Article(int id, String regDate, String updateDate, String title, String body) {
+        this.id = id;
+        this.regDate = regDate;
+        this.updateDate = updateDate;
+        this.title = title;
+        this.body = body;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public String getUpdateDate() {
+        return updateDate;
+    }
+
+    public void setUpdateDate(String updateDate) {
+        this.updateDate = updateDate;
+    }
+
+    public String getRegDate() {
+        return regDate;
+    }
+
+    public void setRegDate(String regDate) {
+        this.regDate = regDate;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getBody() {
+        return body;
+    }
+
+    public void setBody(String body) {
+        this.body = body;
+    }
+
+
+}

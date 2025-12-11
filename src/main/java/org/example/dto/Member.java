@@ -1,4 +1,4 @@
-package org.example;
+package org.example.dto;
 
 public class Member {
     private int id;

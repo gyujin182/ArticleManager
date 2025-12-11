@@ -1,4 +1,8 @@
-package org.example;
+package org.example.controller;
+
+import org.example.dto.Article;
+import org.example.dto.Member;
+import org.example.util.Util;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,7 +10,7 @@ import java.util.Scanner;
 
 public class ArticleController extends Controller {
     private Scanner sc;
-    private  List<Article> articles;
+    private List<Article> articles;
     private String cmd;
 
     private int lastArticleId = 3;
@@ -51,7 +55,7 @@ public class ArticleController extends Controller {
         String regDate = Util.getNowStr();
         String updateDate = Util.getNowStr();
 
-        Article article = new Article(id, regDate, updateDate, title, body);
+        Article article = new Article(id, regDate, updateDate, title, body, loginedMember.getName());
         articles.add(article);
 
         System.out.println(id + "번 글이 작성되었습니다.");
@@ -135,11 +139,13 @@ public class ArticleController extends Controller {
         int id = Integer.parseInt(cmd.split(" ")[2]);
 
         Article foundArticle = getArticleById(id);
+        Article foundmember = getArticleBymember(loginedMember.getName());
 
         if (foundArticle == null) {
             System.out.println("해당 게시글은 없습니다");
             return;
         }
+        if (Article.member == loginedMember.getName()){
         System.out.println("기존 title : " + foundArticle.getTitle());
         System.out.println("기존 body : " + foundArticle.getBody());
         System.out.print("새 제목 : ");
@@ -153,8 +159,10 @@ public class ArticleController extends Controller {
         foundArticle.setUpdateDate(Util.getNowStr());
 
         System.out.println(id + "번 게시글이 수정되었습니다");
+    }else {
+            System.out.println("작성자만 수정할 수 있습니다.");
+        }
     }
-
     private Article getArticleById(int id) {
         for (Article article : articles) {
             if (article.getId() == id) {
@@ -163,14 +171,21 @@ public class ArticleController extends Controller {
         }
         return null;
     }
-
+    private Article getArticleBymember(String name) {
+        for (Article member : articles) {
+            if (member.getMember() == name) {
+                return member;
+            }
+        }
+        return null;
+    }
     /**
      * 게시글 테스트 데이터 생성
      **/
     public void makeTestData() {
         System.out.println("==게시글 테스트 데이터 생성==");
-        articles.add(new Article(1, "2025-12-07 12:12:12", "2025-12-07 12:12:12", "제목 123", "내용 1"));
-        articles.add(new Article(2, Util.getNowStr(), Util.getNowStr(), "제목 23", "내용 2"));
-        articles.add(new Article(3, Util.getNowStr(), Util.getNowStr(), "제목 1234", "내용 3"));
+        articles.add(new Article(1, "2025-12-07 12:12:12", "2025-12-07 12:12:12", "제목 123", "내용 1","규진"));
+        articles.add(new Article(2, Util.getNowStr(), Util.getNowStr(), "제목 23", "내용 2","규진"));
+        articles.add(new Article(3, Util.getNowStr(), Util.getNowStr(), "제목 1234", "내용 3","규진"));
     }
 }

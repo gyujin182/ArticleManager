@@ -1,4 +1,4 @@
-package org.example;
+package org.example.dto;
 
 public class Article {
     private int id;
@@ -6,13 +6,23 @@ public class Article {
     private String updateDate;
     private String title;
     private String body;
+    public static String member;
 
-    public Article(int id, String regDate, String updateDate, String title, String body) {
+    public Article(int id, String regDate, String updateDate, String title, String body, String member) {
         this.id = id;
         this.regDate = regDate;
         this.updateDate = updateDate;
         this.title = title;
         this.body = body;
+        this.member = member;
+    }
+
+    public String getMember() {
+        return member;
+    }
+
+    public void setMember(String member) {
+        this.member = member;
     }
 
     public int getId() {

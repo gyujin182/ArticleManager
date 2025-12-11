@@ -1,5 +1,5 @@
 
-package org.example;
+package org.example.ArticleMasnager;
 
 
 public class Main {
